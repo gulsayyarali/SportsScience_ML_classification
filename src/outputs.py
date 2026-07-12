@@ -49,22 +49,25 @@ def publish_final_summary(all_rows):
     summary_root.mkdir(parents=True, exist_ok=True)
 
     df = pd.DataFrame(all_rows)
-    for task in config.TASK_ORDER:
-        group = df[df["task"] == task]
-        if group.empty:
-            continue
-        best = _best_row(group)
-        dest = config.final_summary_dir(task)
-        dest.mkdir(parents=True, exist_ok=True)
-        model = best["model"]
-        for key, suffix in (("p1_png", "_p1_overview.png"), ("p2_png", "_p2_evaluation.png")):
-            src = Path(best.get(key, ""))
-            if src.exists():
-                shutil.copy2(src, dest / f"{config.MODEL_LABELS.get(model, model).lower()}{suffix}")
-        pdf = Path(best["pdf_path"])
-        if pdf.exists():
-            shutil.copy2(pdf, dest / pdf.name)
-        print(f"  final_summary/{config.TASK_DIRS[task]}: {model} (auroc={best['auroc']:.3f})")
+    for run_name, _ in config.RUN_CONFIGS:
+        for task in config.TASK_ORDER:
+            group = df[(df["run"] == run_name) & (df["task"] == task)]
+            if group.empty:
+                continue
+            best = _best_row(group)
+            dest = config.final_summary_dir(run_name, task)
+            dest.mkdir(parents=True, exist_ok=True)
+            model = best["model"]
+            label = config.MODEL_LABELS.get(model, model).lower()
+            for key, suffix in (("p1_png", "_p1_overview.png"), ("p2_png", "_p2_evaluation.png")):
+                src = Path(best.get(key, ""))
+                if src.exists():
+                    shutil.copy2(src, dest / f"{label}{suffix}")
+            pdf = Path(best["pdf_path"])
+            if pdf.exists():
+                shutil.copy2(pdf, dest / pdf.name)
+            print(f"  final_summary/{run_name}/{config.TASK_DIRS[task]}: "
+                  f"{model} (auroc={best['auroc']:.3f})")
 
 
 def _comparison_row(row):
@@ -86,7 +89,8 @@ def _comparison_row(row):
 
 
 def write_comparison_excel(all_rows):
-    path = config.RESULTS_DIR / "model_comparison.xlsx"
+    path = config.RESULTS_DIR / "final_summary" / "model_comparison.xlsx"
+    path.parent.mkdir(parents=True, exist_ok=True)
     with pd.ExcelWriter(path, engine="openpyxl") as writer:
         for run_name, _ in config.RUN_CONFIGS:
             rows = [r for r in all_rows if r["run"] == run_name]

@@ -141,5 +141,5 @@ def task_dir(run_name, task):
     return run_dir(run_name) / TASK_DIRS[task]
 
 
-def final_summary_dir(task):
-    return RESULTS_DIR / "final_summary" / TASK_DIRS[task]
+def final_summary_dir(run_name, task):
+    return RESULTS_DIR / "final_summary" / run_name / TASK_DIRS[task]

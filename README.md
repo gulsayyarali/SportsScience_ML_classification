@@ -26,13 +26,13 @@ The pipeline runs twice, over two different feature sets. The first, called All_
 
 # 6. Model architecture and training setup
 
-Five classifiers were trained, Logistic Regression, Random Forest, SVM, XGBoost, and a MLP with two hidden layers of 128 and 64 units. This range covers linear to non-linear ensemble to neural approaches, which makes sense here, with only 207 samples, some algorithms are much more prone to overfitting than others, and testing several is cheaper than guessing the right one upfront. All classic models were evaluated with 5-fold stratified cross-validation so that every reported metric comes from held-out data, never training folds. The MLP gets its own CV loop that also tracks per-epoch training and validation accuracy and loss using a 75/25 split inside each fold's training portion, so learning curves are visible. Class weighting was applied where supported to account for class imbalance, especially for the MCI group in the multiclass task.
+Five classifiers were trained, Logistic Regression, Random Forest, SVM, XGBoost, and a MLP with two hidden layers of 128 and 64 units. This range covers linear to non-linear ensemble to neural approaches, which makes sense here, with only 207 samples, some algorithms are much more prone to overfitting than others, and testing several is cheaper than guessing the right one upfront. All classic models were evaluated with 5-fold stratified cross-validation so that every reported metric comes from held-out data, never training folds. The MLP gets its own CV loop that also tracks per-epoch training and validation accuracy and loss using a 75/25 split inside each fold's training portion, so learning curves are visible. Class weighting was applied where supported to account for class imbalance.
 
 # 7. Results
 
 Each model is scored on accuracy, F1-score, AUROC, and AUPRC from the out-of-fold predictions. Two mian figures are generated per model, one showing class balance, confusion matrix, a per-sample classification scatter, and SHAP importance plots, the other showing training curves, ROC and precision-recall curves, and per-class specificity and F1-score.
 
-Full model comparison tables for all five models (LR, RF, MLP, SVM, XGBoost) across all three tasks are in `results/final_summary/model_comparison.xlsx`.
+Full model comparison tables for all five models (LR, RF, MLP, SVM, XGBoost) across both binary tasks (and multiclass, see below) are in `results/final_summary/model_comparison.xlsx`.
 
 ## 7.1 All features
 
@@ -44,14 +44,12 @@ This run keeps every available feature (137 after preprocessing) so we can see t
 |------|-------|----------|---------|---------------|----------|
 | Binary CHI vs MCI | XGBoost | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
 | Binary CHI vs Impaired | XGBoost | 0.7729 | 0.8693 | 0.7455 | 0.7564 |
-| Multiclass CHI / pMCI / MCI | XGBoost | 0.6280 | 0.7968 | 0.6627 | 0.6174 |
 
 ### Binary_CHI_vs_MCI
 
 ![XGBoost CHI vs MCI — overview](results/final_summary/All_features/Binary_CHI_vs_MCI/xgboost_p1_overview.png)
 
 With pMCI excluded, XGBoost reached perfect out-of-fold separation on this subset (n=134). As with the impaired binary task, CERAD and MoCA features again drive most of the SHAP signal.
-
 
 ![XGBoost CHI vs MCI — evaluation](results/final_summary/All_features/Binary_CHI_vs_MCI/xgboost_p2_evaluation.png)
 
@@ -67,16 +65,6 @@ XGBoost correctly separated CHI from impaired individuals in the majority of cas
 
 Across the 5 folds, accuracy stayed between 0.69 and 0.85, with no fold collapsing to chance — this is a stable result, not a lucky split. The ROC curves show good separation for both classes (AUC 0.87), and the precision-recall curves hold up reasonably well (AP 0.74 for CHI, 0.94 for Impaired).
 
-### multiclass_CHI_pMCI_MCI
-
-![XGBoost multiclass — overview](results/final_summary/All_features/multiclass_CHI_pMCI_MCI/xgboost_p1_overview.png)
-
-The three-way task is noticeably harder, especially separating pMCI from MCI. The confusion matrix shows more misclassifications between these two adjacent groups, which is expected, the distinction between them is subtler than the difference between either and CHI.
-
-![XGBoost multiclass — evaluation](results/final_summary/All_features/multiclass_CHI_pMCI_MCI/xgboost_p2_evaluation.png)
-
-The multiclass ROC (AUROC 0.80) is still reasonable for a three-class problem at this sample size, but the per-class F1 scores show more variation, confirming that pMCI is the hardest group to classify reliably.
-
 ## 7.2 wo_CERAD_demo
 
 CERAD, MoCA, and demographics (sex, age, years of education) are removed in this run so the models must rely on questionnaire, gait, fine motor, force and fitness, and EEG features — a stricter test of whether sensor domains carry signal on their own, without scores that closely mirror the clinical label.
@@ -87,12 +75,10 @@ CERAD, MoCA, and demographics (sex, age, years of education) are removed in this
 |------|-------|----------|---------|---------------|----------|
 | Binary CHI vs MCI | LR | 0.6269 | 0.7015 | 0.7784 | 0.6145 |
 | Binary CHI vs Impaired | LR | 0.5507 | 0.5862 | 0.4491 | 0.5295 |
-| Multiclass CHI / pMCI / MCI | LR | 0.3768 | 0.5774 | 0.3990 | 0.3736 |
 
 ### Binary_CHI_vs_MCI
 
 ![LR CHI vs MCI — overview](results/final_summary/wo_CERAD_demo/Binary_CHI_vs_MCI/lr_p1_overview.png)
-
 
 ![LR CHI vs MCI — evaluation](results/final_summary/wo_CERAD_demo/Binary_CHI_vs_MCI/lr_p2_evaluation.png)
 
@@ -106,18 +92,10 @@ Without CERAD and MoCA, Logistic Regression remains the strongest model on this 
 
 Once CERAD, MoCA, and demographics are removed, performance drops sharply across all models. AUROC falls to near chance (0.50–0.58) and accuracy drops by 15–25 points compared to the full-feature run.
 
-### multiclass_CHI_pMCI_MCI
-
-
-![LR multiclass — overview](results/final_summary/wo_CERAD_demo/multiclass_CHI_pMCI_MCI/lr_p1_overview.png)
-
-
-![LR multiclass — evaluation](results/final_summary/wo_CERAD_demo/multiclass_CHI_pMCI_MCI/lr_p2_evaluation.png)
-
-Multiclass performance without neuropsychological scores stays close to chance (AUROC 0.58), confirming that the three-way task is difficult when label-proximal features are excluded.
+We also ran a multiclass task (CHI / pMCI / MCI) on both feature configurations, but the results were not strong enough to report in detail here. In the All_features run, the best model (XGBoost) reached an accuracy of 0.63, AUROC of 0.80, and average precision of 0.66 — reasonable on paper, but still far from reliable clinical separation, especially between pMCI and MCI. In the wo_CERAD_demo run, the best model (Logistic Regression) dropped to an accuracy of 0.38, AUROC of 0.58, and average precision of 0.40, essentially at random guessing. Full multiclass results for all models are available in `results/final_summary/model_comparison.xlsx`.
 
 # 8. Conclusion
 
-As we see, XGBoost performed best in the All_features run, with an AUROC of 0.87 on the binary task and 0.80 on the multiclass task. Gradient boosting handles mixed-scale, moderately noisy tabular data well, and its ability to capture feature interactions is a good fit for this kind of multi-domain dataset. The binary task (CHI vs. impaired) was much easier for all models than the three-way task, which is not surprising, distinguishing pMCI from MCI is a finer and harder call.
+As we see, XGBoost performed best in the All_features run, with an AUROC of 0.87 on the CHI vs. impaired binary task and perfect separation on CHI vs. MCI when pMCI is excluded. Gradient boosting handles mixed-scale, moderately noisy tabular data well, and its ability to capture feature interactions is a good fit for this kind of multi-domain dataset.
 
 The more important finding, though, is the gap between the two runs. When CERAD, MoCA, and demographics are removed, every model drops close to random guessing (chance). This tells us that most of the predictive power in the full-feature run was coming from scores that are already closely tied to the diagnostic label, not from the gait, EEG, fine-motor, or fitness measurements and our SHAP plots confirm this, MoCA and CERAD subtests sit at the top of the feature importance rankings by a wide margin in the full-feature run, while EEG and gait features appear lower down with smaller, more mixed contributions. That is why we excluded the top feature of the first run, wo_CERAD_demo run give us more a honest estimate of what these domains can actually detect independently.

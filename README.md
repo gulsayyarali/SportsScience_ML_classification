@@ -40,11 +40,11 @@ This run keeps every available feature (137 after preprocessing) so we can see t
 
 ### Best model summary
 
-| Task | model | accuracy | roc_auc | avg_precision | f1_macro | precision_CHI | recall_CHI | f1_CHI | specificity_CHI | misclassified_CHI |
-|------|-------|----------|---------|---------------|----------|---------------|------------|--------|-----------------|-------------------|
-| Binary CHI vs MCI | XGBoost | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 |
-| Binary CHI vs Impaired | XGBoost | 0.7729 | 0.8693 | 0.7455 | 0.7564 | 0.6883 | 0.6974 | 0.6928 | 0.6974 | 23 |
-| Multiclass CHI / pMCI / MCI | XGBoost | 0.6280 | 0.7968 | 0.6627 | 0.6174 | 0.6703 | 0.8026 | 0.7305 | 0.7710 | 15 |
+| Task | model | accuracy | roc_auc | avg_precision | f1-score |
+|------|-------|----------|---------|---------------|----------|
+| Binary CHI vs MCI | XGBoost | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| Binary CHI vs Impaired | XGBoost | 0.7729 | 0.8693 | 0.7455 | 0.7564 |
+| Multiclass CHI / pMCI / MCI | XGBoost | 0.6280 | 0.7968 | 0.6627 | 0.6174 |
 
 ### Binary_CHI_vs_MCI
 
@@ -83,11 +83,11 @@ CERAD, MoCA, and demographics (sex, age, years of education) are removed in this
 
 ### Best model summary
 
-| Task | model | accuracy | roc_auc | avg_precision | f1_macro | precision_CHI | recall_CHI | f1_CHI | specificity_CHI | misclassified_CHI |
-|------|-------|----------|---------|---------------|----------|---------------|------------|--------|-----------------|-------------------|
-| Binary CHI vs MCI | LR | 0.6269 | 0.7015 | 0.7784 | 0.6145 | 0.6585 | 0.7105 | 0.6835 | 0.7105 | 22 |
-| Binary CHI vs Impaired | LR | 0.5507 | 0.5862 | 0.4491 | 0.5295 | 0.4023 | 0.4605 | 0.4294 | 0.4605 | 41 |
-| Multiclass CHI / pMCI / MCI | LR | 0.3768 | 0.5774 | 0.3990 | 0.3736 | 0.4375 | 0.4605 | 0.4487 | 0.6565 | 41 |
+| Task | model | accuracy | roc_auc | avg_precision | f1-score |
+|------|-------|----------|---------|---------------|----------|
+| Binary CHI vs MCI | LR | 0.6269 | 0.7015 | 0.7784 | 0.6145 |
+| Binary CHI vs Impaired | LR | 0.5507 | 0.5862 | 0.4491 | 0.5295 |
+| Multiclass CHI / pMCI / MCI | LR | 0.3768 | 0.5774 | 0.3990 | 0.3736 |
 
 ### Binary_CHI_vs_MCI
 
@@ -118,6 +118,6 @@ Multiclass performance without neuropsychological scores stays close to chance (
 
 # 8. Conclusion
 
-XGBoost performed best in the All_features run, with an AUROC of 0.87 on the binary task and 0.80 on the multiclass task. Gradient boosting handles mixed-scale, moderately noisy tabular data well, and its ability to capture feature interactions is a good fit for this kind of multi-domain dataset. The binary task (CHI vs. impaired) was much easier for all models than the three-way task, which is not surprising, distinguishing pMCI from MCI is a finer and harder call.
+As we see, XGBoost performed best in the All_features run, with an AUROC of 0.87 on the binary task and 0.80 on the multiclass task. Gradient boosting handles mixed-scale, moderately noisy tabular data well, and its ability to capture feature interactions is a good fit for this kind of multi-domain dataset. The binary task (CHI vs. impaired) was much easier for all models than the three-way task, which is not surprising, distinguishing pMCI from MCI is a finer and harder call.
 
 The more important finding, though, is the gap between the two runs. When CERAD, MoCA, and demographics are removed, every model drops close to random guessing (chance). This tells us that most of the predictive power in the full-feature run was coming from scores that are already closely tied to the diagnostic label, not from the gait, EEG, fine-motor, or fitness measurements and our SHAP plots confirm this, MoCA and CERAD subtests sit at the top of the feature importance rankings by a wide margin in the full-feature run, while EEG and gait features appear lower down with smaller, more mixed contributions. That is why we excluded the top feature of the first run, wo_CERAD_demo run give us more a honest estimate of what these domains can actually detect independently.

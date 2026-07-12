@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Virtual environments (do not upload)
+project_py/
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+
+# Logs
+*.log

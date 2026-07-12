@@ -38,7 +38,7 @@ Full model comparison tables for all five models (LR, RF, MLP, SVM, XGBoost) acr
 
 This run keeps every available feature (137 after preprocessing) so we can see the upper bound of what the full SENDA dataset can predict when neuropsychological scores, demographics, and sensor domains are all included together.
 
-#### Best model summary
+### Best model summary
 
 | Task | model | accuracy | roc_auc | avg_precision | f1_macro | precision_CHI | recall_CHI | f1_CHI | specificity_CHI | misclassified_CHI |
 |------|-------|----------|---------|---------------|----------|---------------|------------|--------|-----------------|-------------------|
@@ -46,38 +46,33 @@ This run keeps every available feature (137 after preprocessing) so we can see t
 | Binary CHI vs Impaired | XGBoost | 0.7729 | 0.8693 | 0.7455 | 0.7564 | 0.6883 | 0.6974 | 0.6928 | 0.6974 | 23 |
 | Multiclass CHI / pMCI / MCI | XGBoost | 0.6280 | 0.7968 | 0.6627 | 0.6174 | 0.6703 | 0.8026 | 0.7305 | 0.7710 | 15 |
 
-#### Binary_CHI_vs_MCI
+### Binary_CHI_vs_MCI
 
-# **Binary CHI vs MCI - class balance, confusion matrix, classification scatter, SHAP**
 ![XGBoost CHI vs MCI — overview](results/final_summary/All_features/Binary_CHI_vs_MCI/xgboost_p1_overview.png)
 
 With pMCI excluded, XGBoost reached perfect out-of-fold separation on this subset (n=134). As with the impaired binary task, CERAD and MoCA features again drive most of the SHAP signal.
 
-## **Binary CHI vs MCI - training curves, ROC/PR, per-class specificity and F1**
+
 ![XGBoost CHI vs MCI — evaluation](results/final_summary/All_features/Binary_CHI_vs_MCI/xgboost_p2_evaluation.png)
 
 All five folds held at high accuracy (0.88–1.00). ROC and precision-recall curves show near-complete separation (AUROC 1.00), though this likely reflects overlap between neuropsychological scores and the clinical label rather than sensor-only discrimination.
 
-#### Binary_CHI_vs_impaired
+### Binary_CHI_vs_impaired
 
-# **Binary - class balance, confusion matrix, classification scatter, SHAP**
 ![XGBoost binary — overview](results/final_summary/All_features/Binary_CHI_vs_impaired/xgboost_p1_overview.png)
 
 XGBoost correctly separated CHI from impaired individuals in the majority of cases. Looking at the SHAP plot, MoCA and CERAD scores dominate the top features — high scores consistently push predictions toward CHI, which makes sense given how closely those tests relate to the label.
 
-## **Binary - training curves, ROC/PR, per-class specificity and F1**
 ![XGBoost binary — evaluation](results/final_summary/All_features/Binary_CHI_vs_impaired/xgboost_p2_evaluation.png)
 
 Across the 5 folds, accuracy stayed between 0.69 and 0.85, with no fold collapsing to chance — this is a stable result, not a lucky split. The ROC curves show good separation for both classes (AUC 0.87), and the precision-recall curves hold up reasonably well (AP 0.74 for CHI, 0.94 for Impaired).
 
-#### multiclass_CHI_pMCI_MCI
+### multiclass_CHI_pMCI_MCI
 
-# *Multiclass - class balance, confusion matrix, classification scatter, SHAP*
 ![XGBoost multiclass — overview](results/final_summary/All_features/multiclass_CHI_pMCI_MCI/xgboost_p1_overview.png)
 
 The three-way task is noticeably harder, especially separating pMCI from MCI. The confusion matrix shows more misclassifications between these two adjacent groups, which is expected, the distinction between them is subtler than the difference between either and CHI.
 
-## **Multiclass - training curves, ROC/PR, per-class specificity and F1**
 ![XGBoost multiclass — evaluation](results/final_summary/All_features/multiclass_CHI_pMCI_MCI/xgboost_p2_evaluation.png)
 
 The multiclass ROC (AUROC 0.80) is still reasonable for a three-class problem at this sample size, but the per-class F1 scores show more variation, confirming that pMCI is the hardest group to classify reliably.
@@ -86,7 +81,7 @@ The multiclass ROC (AUROC 0.80) is still reasonable for a three-class problem at
 
 CERAD, MoCA, and demographics (sex, age, years of education) are removed in this run so the models must rely on questionnaire, gait, fine motor, force and fitness, and EEG features — a stricter test of whether sensor domains carry signal on their own, without scores that closely mirror the clinical label.
 
-#### Best model summary
+### Best model summary
 
 | Task | model | accuracy | roc_auc | avg_precision | f1_macro | precision_CHI | recall_CHI | f1_CHI | specificity_CHI | misclassified_CHI |
 |------|-------|----------|---------|---------------|----------|---------------|------------|--------|-----------------|-------------------|
@@ -94,32 +89,29 @@ CERAD, MoCA, and demographics (sex, age, years of education) are removed in this
 | Binary CHI vs Impaired | LR | 0.5507 | 0.5862 | 0.4491 | 0.5295 | 0.4023 | 0.4605 | 0.4294 | 0.4605 | 41 |
 | Multiclass CHI / pMCI / MCI | LR | 0.3768 | 0.5774 | 0.3990 | 0.3736 | 0.4375 | 0.4605 | 0.4487 | 0.6565 | 41 |
 
-#### Binary_CHI_vs_MCI
+### Binary_CHI_vs_MCI
 
-# *Binary CHI vs MCI - class balance, confusion matrix, classification scatter, SHAP*
 ![LR CHI vs MCI — overview](results/final_summary/wo_CERAD_demo/Binary_CHI_vs_MCI/lr_p1_overview.png)
 
-## **Binary CHI vs MCI - training curves, ROC/PR, per-class specificity and F1**
+
 ![LR CHI vs MCI — evaluation](results/final_summary/wo_CERAD_demo/Binary_CHI_vs_MCI/lr_p2_evaluation.png)
 
 Without CERAD and MoCA, Logistic Regression remains the strongest model on this task (AUROC 0.70), but performance is well below the All_features run.
 
-#### Binary_CHI_vs_impaired
+### Binary_CHI_vs_impaired
 
-# *Binary - class balance, confusion matrix, classification scatter, SHAP*
 ![LR binary — overview](results/final_summary/wo_CERAD_demo/Binary_CHI_vs_impaired/lr_p1_overview.png)
 
-## *Binary - training curves, ROC/PR, per-class specificity and F1*
 ![LR binary — evaluation](results/final_summary/wo_CERAD_demo/Binary_CHI_vs_impaired/lr_p2_evaluation.png)
 
 Once CERAD, MoCA, and demographics are removed, performance drops sharply across all models. AUROC falls to near chance (0.50–0.58) and accuracy drops by 15–25 points compared to the full-feature run.
 
-## multiclass_CHI_pMCI_MCI
+### multiclass_CHI_pMCI_MCI
 
-# *Multiclass - class balance, confusion matrix, classification scatter, SHAP*
+
 ![LR multiclass — overview](results/final_summary/wo_CERAD_demo/multiclass_CHI_pMCI_MCI/lr_p1_overview.png)
 
-## **Multiclass - training curves, ROC/PR, per-class specificity and F1**
+
 ![LR multiclass — evaluation](results/final_summary/wo_CERAD_demo/multiclass_CHI_pMCI_MCI/lr_p2_evaluation.png)
 
 Multiclass performance without neuropsychological scores stays close to chance (AUROC 0.58), confirming that the three-way task is difficult when label-proximal features are excluded.
